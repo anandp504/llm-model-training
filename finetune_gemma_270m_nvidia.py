@@ -1,3 +1,44 @@
+import os
+import torch
+import subprocess
+import sys
+
+# Set CUDA environment variables for better GPU detection
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # Use first GPU
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+# Check GPU availability
+print("=== GPU Detection ===")
+print(f"PyTorch version: {torch.__version__}")
+print(f"CUDA available: {torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    print(f"CUDA version: {torch.version.cuda}")
+    print(f"GPU count: {torch.cuda.device_count()}")
+    for i in range(torch.cuda.device_count()):
+        gpu_name = torch.cuda.get_device_name(i)
+        gpu_memory = torch.cuda.get_device_properties(i).total_memory / 1024**3
+        print(f"GPU {i}: {gpu_name} ({gpu_memory:.1f} GB)")
+else:
+    print("No CUDA GPU detected!")
+    print("Checking for NVIDIA drivers...")
+    try:
+        result = subprocess.run(['nvidia-smi'], capture_output=True, text=True)
+        if result.returncode == 0:
+            print("NVIDIA drivers found, but PyTorch CUDA not working")
+            print("Output:", result.stdout)
+        else:
+            print("NVIDIA drivers not found or nvidia-smi failed")
+    except FileNotFoundError:
+        print("nvidia-smi not found - NVIDIA drivers may not be installed")
+
+# Force CUDA device if available
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
+    print(f"Using device: {device}")
+else:
+    print("Falling back to CPU (not recommended for training)")
+    device = torch.device("cpu")
+
 from autotrain.params import LLMTrainingParams
 from autotrain.project import AutoTrainProject
 
