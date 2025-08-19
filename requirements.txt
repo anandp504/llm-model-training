@@ -1,0 +1,15 @@
+# Mac MPS compatible requirements
+torch>=2.0.0
+torchvision
+torchaudio
+autotrain-advanced==0.7.0  # Downgraded to avoid Flash Attention 2 issues
+accelerate
+numpy==1.26.4
+datasets
+peft
+# Use specific versions that work on macOS
+# transformers==4.48.0
+sentencepiece>=0.1.99
+protobuf>=3.20.0
+# Explicitly exclude bitsandbytes for Mac compatibility
+# bitsandbytes  # commented out for Mac MPS compatibility
